@@ -3,9 +3,9 @@
 const path = require("path");
 const findProcess = require("find-process");
 const trimStart = require("lodash/trimStart");
-const startsWith = require("lodash/startsWith");
 const endsWith = require("lodash/endsWith");
 const includes = require("lodash/includes");
+const findIndex = require("lodash/findIndex");
 
 /** Entry script filename */
 let script = process.mainModule.filename;
@@ -16,7 +16,7 @@ script = endsWith(script, path.sep + "index") ? script.slice(0, -6) : script;
 function getAllProcesses() {
     return findProcess("name", "node", true).then(items => {
         var members = [];
-        var ppid;
+
         for (let i = 0; i < items.length; i++) {
             let item = items[i];
             let cmd = trimStart(item.cmd, '"');
@@ -27,14 +27,10 @@ function getAllProcesses() {
             // forked by one of the child-process. So to avoid getting those 
             // unexpected processes, ensure all retrieved processes are fork by
             // the same process.
-            if (startsWith(cmd, process.argv[0])
-                && includes(cmd, script)
-                && (!ppid || item.ppid === ppid)
-            ) {
-                members.push(item);
-
-                if (ppid === undefined)
-                    ppid = item.ppid;
+            if (includes(cmd, script)) {
+                let i = findIndex(members, member => member.pid === item.ppid);
+                if (i === -1 || i === 0)
+                    members.push(item);
             }
         }
 
