@@ -17,7 +17,7 @@ if (cluster.isMaster) {
             uid: process.getuid && process.getuid(),
             gid: process.getgid && process.getgid(),
             name: "node",
-            cmd: [process.argv0].concat(process.execArgv, process.argv.slice(1)).join(" ")
+            cmd: [process.argv[0]].concat(process.execArgv, process.argv.slice(1)).join(" ")
         };
 
         assert.deepStrictEqual(processes, [__process]);

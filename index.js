@@ -27,7 +27,7 @@ function getAllProcesses() {
             // forked by one of the child-process. So to avoid getting those 
             // unexpected processes, ensure all retrieved processes are fork by
             // the same process.
-            if (startsWith(cmd, process.argv0)
+            if (startsWith(cmd, process.argv[0])
                 && includes(cmd, script)
                 && (!ppid || item.ppid === ppid)
             ) {
@@ -47,7 +47,7 @@ function getAllProcesses() {
                 uid: process.getuid && process.getuid(),
                 gid: process.getgid && process.getgid(),
                 name: "node",
-                cmd: [process.argv0].concat(process.execArgv, process.argv.slice(1)).join(" ")
+                cmd: [process.argv[0]].concat(process.execArgv, process.argv.slice(1)).join(" ")
             }];
         }
     });
