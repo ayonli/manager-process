@@ -6,7 +6,6 @@ var co = require("co");
 var manager = require(".");
 
 if (cluster.isMaster) {
-    console.log(process.pid, process.execArgv.join(" "));
     co(function* () {
         var processes = yield manager.getAllProcesses();
         var _manager = yield manager.getManager();
@@ -18,7 +17,7 @@ if (cluster.isMaster) {
             uid: process.getuid && process.getuid(),
             gid: process.getgid && process.getgid(),
             name: "node",
-            cmd: "node " + process.execArgv.join(" ")
+            cmd: [process.argv0].concat(process.execArgv, process.argv.slice(1)).join(" ")
         };
 
         assert.deepStrictEqual(processes, [__process]);
@@ -45,7 +44,6 @@ if (cluster.isMaster) {
                 assert.deepStrictEqual(msg[1], managerProcess);
                 assert.strictEqual(msg[2], managerPid);
 
-                console.log(msg[0]);
                 assert.strictEqual(msg.length, 4);
                 assert.strictEqual(msg[0].length, 4);
 

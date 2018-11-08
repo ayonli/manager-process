@@ -3,6 +3,7 @@
 const path = require("path");
 const findProcess = require("find-process");
 const trimStart = require("lodash/trimStart");
+const startsWith = require("lodash/startsWith");
 const endsWith = require("lodash/endsWith");
 const includes = require("lodash/includes");
 
@@ -15,10 +16,26 @@ script = endsWith(script, path.sep + "index") ? script.slice(0, -6) : script;
 function getAllProcesses() {
     return findProcess("name", "node", true).then(items => {
         var members = [];
+        var ppid;
         for (let i = 0; i < items.length; i++) {
             let item = items[i];
+            let cmd = trimStart(item.cmd, '"');
 
-            includes(item.cmd, script) && members.push(item);
+            // On Linux, as I've tried, sometimes the system will create more 
+            // processes as expected in cluster mode, however the extra 
+            // processes are not forked by the master class, instead they are 
+            // forked by one of the child-process. So to avoid getting those 
+            // unexpected processes, ensure all retrieved processes are fork by
+            // the same process.
+            if (startsWith(cmd, process.argv0)
+                && includes(cmd, script)
+                && (!ppid || item.ppid === ppid)
+            ) {
+                members.push(item);
+
+                if (ppid === undefined)
+                    ppid = item.ppid;
+            }
         }
 
         if (members.length) {
@@ -30,7 +47,7 @@ function getAllProcesses() {
                 uid: process.getuid && process.getuid(),
                 gid: process.getgid && process.getgid(),
                 name: "node",
-                cmd: "node " + process.execArgv.join(" ")
+                cmd: [process.argv0].concat(process.execArgv, process.argv.slice(1)).join(" ")
             }];
         }
     });
