@@ -1,0 +1,31 @@
+{
+  "name": "manager-process",
+  "version": "0.1.2",
+  "description": "Gets the manager process in a multi-processing application.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyurl/manager-process.git"
+  },
+  "keywords": [
+    "multi-processing",
+    "manager-process"
+  ],
+  "author": "Ayon Lee <i@hyurl.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hyurl/manager-process/issues"
+  },
+  "homepage": "https://github.com/hyurl/manager-process#readme",
+  "dependencies": {
+    "find-process": "^1.2.0",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "co": "^4.6.0"
+  }
+}
