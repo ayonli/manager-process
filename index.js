@@ -13,7 +13,7 @@ script = endsWith(script, ".js") ? script.slice(0, -3) : script;
 script = endsWith(script, path.sep + "index") ? script.slice(0, -6) : script;
 
 function getAllProcesses() {
-    return findProcess("name", "node", true).then((items) => {
+    return findProcess("name", "node", true).then(items => {
         var members = [];
         for (let i = 0; i < items.length; i++) {
             let item = items[i];
