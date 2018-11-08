@@ -6,6 +6,9 @@ const trimStart = require("lodash/trimStart");
 const endsWith = require("lodash/endsWith");
 const includes = require("lodash/includes");
 const findIndex = require("lodash/findIndex");
+const find = require("lodash/find");
+const map = require("lodash/map");
+const unique = require("lodash/uniq");
 
 /** Entry script filename */
 let script = process.mainModule.filename;
@@ -29,6 +32,9 @@ function getAllProcesses() {
             // the same process.
             if (includes(cmd, script)) {
                 let i = findIndex(members, member => member.pid === item.ppid);
+
+                // if 'i' is 0, that indicates the first process is the master 
+                // process itself.
                 if (i === -1 || i === 0)
                     members.push(item);
             }
@@ -50,7 +56,14 @@ function getAllProcesses() {
 }
 
 function getManager() {
-    return getAllProcesses().then(items => items[0]);
+    return getAllProcesses().then(items => {
+        // The items may contain the master process, which is not supposed to be
+        // the manager when with cluster or child_process.
+        let ppids = unique(map(items, item => item.ppid)),
+            ppid = ppids.length > 1 ? ppids[1] : ppids[0]; // might be undefined
+
+        return find(items, item => item.ppid === ppid);
+    });
 }
 
 function getManagerPid() {
