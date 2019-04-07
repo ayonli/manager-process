@@ -2,41 +2,43 @@
 
 const path = require("path");
 const findProcess = require("find-process");
-const trimStart = require("lodash/trimStart");
 const endsWith = require("lodash/endsWith");
-const includes = require("lodash/includes");
-const findIndex = require("lodash/findIndex");
 const find = require("lodash/find");
 const map = require("lodash/map");
 const unique = require("lodash/uniq");
+const splitArgv = require("argv-split");
 
 /** Entry script filename */
-let script = process.mainModule.filename;
+let entry = getEntry(process.mainModule.filename);
 
-script = endsWith(script, ".js") ? script.slice(0, -3) : script;
-script = endsWith(script, path.sep + "index") ? script.slice(0, -6) : script;
+/**
+ * @param {string} script 
+ */
+function getEntry(script) {
+    let entry = endsWith(script, ".js") || endsWith(script, ".ts")
+        ? script.slice(0, -3)
+        : script;
+
+    return endsWith(entry, path.sep + "index") ? entry.slice(0, -6) : entry;
+}
+
+/**
+ * @param {string} cmd 
+ * @returns {string}
+ */
+function getScript(cmd) {
+    return find(splitArgv(cmd).slice(1), arg => arg[0] !== "-");
+}
 
 function getAllProcesses() {
     return findProcess("name", "node", true).then(items => {
         var members = [];
 
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
-            let cmd = trimStart(item.cmd, '"');
+        for (let item of items) {
+            let script = getScript(item.cmd);
 
-            // On Linux, as I've tried, sometimes the system will create more 
-            // processes as expected in cluster mode, however the extra 
-            // processes are not forked by the master class, instead they are 
-            // forked by one of the child-process. So to avoid getting those 
-            // unexpected processes, ensure all retrieved processes are fork by
-            // the same process.
-            if (includes(cmd, script)) {
-                let i = findIndex(members, member => member.pid === item.ppid);
-
-                // if 'i' is 0, that indicates the first process is the master 
-                // process itself.
-                if (i === -1 || i === 0)
-                    members.push(item);
+            if (script && getEntry(script) === entry) {
+                members.push(item);
             }
         }
 
@@ -49,7 +51,10 @@ function getAllProcesses() {
                 uid: process.getuid && process.getuid(),
                 gid: process.getgid && process.getgid(),
                 name: "node",
-                cmd: [process.argv[0]].concat(process.execArgv, process.argv.slice(1)).join(" ")
+                cmd: [process.argv[0]].concat(
+                    process.execArgv,
+                    process.argv.slice(1)
+                ).join(" ")
             }];
         }
     });
