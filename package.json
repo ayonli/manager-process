@@ -1,6 +1,6 @@
 {
   "name": "manager-process",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Gets the manager process in a multi-processing application.",
   "main": "index.js",
   "types": "index.d.ts",
