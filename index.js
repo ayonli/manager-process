@@ -9,7 +9,7 @@ const unique = require("lodash/uniq");
 const splitArgv = require("argv-split");
 
 /** Entry script filename */
-let entry = getEntry(process.mainModule.filename);
+let entry = getEntry(require.main.filename);
 
 /**
  * @param {string} script 

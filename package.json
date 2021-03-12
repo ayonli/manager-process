@@ -1,6 +1,6 @@
 {
   "name": "manager-process",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Gets the manager process in a multi-processing application.",
   "main": "index.js",
   "types": "index.d.ts",
@@ -23,8 +23,8 @@
   "homepage": "https://github.com/hyurl/manager-process#readme",
   "dependencies": {
     "argv-split": "^2.0.1",
-    "find-process": "^1.2.0",
-    "lodash": "^4.17.11"
+    "find-process": "^1.4.4",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "co": "^4.6.0"
